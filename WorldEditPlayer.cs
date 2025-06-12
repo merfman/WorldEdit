@@ -12,4 +12,12 @@ public class WorldEditPlayer : ModPlayer
 {
     public Vector2 Selection1;
     public Vector2 Selection2;
+    public Clipboard clipboard;
+    
+}
+
+public struct Clipboard
+{
+    public int[,] values;
+    public Vector2 offset;
 }
