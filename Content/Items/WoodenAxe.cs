@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -9,7 +10,6 @@ namespace WorldEdit.Content.Items
 	// https://github.com/tModLoader/tModLoader/tree/stable/ExampleMod
 	public class WoodenAxe : ModItem
 	{
-		// The Display Name and Tooltip of this item can be edited in the 'Localization/en-US_Mods.WorldEdit.hjson' file.
 		public override void SetDefaults()
 		{
 			DisplayName.Format("Wooden Axe");
@@ -18,11 +18,11 @@ namespace WorldEdit.Content.Items
 			Item.DamageType = DamageClass.Melee;
 			Item.width = 40;
 			Item.height = 40;
-			Item.useTime = 20;
-			Item.useAnimation = 20;
+			Item.useTime = 1;
+			Item.useAnimation = 1;
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.knockBack = 6;
-			Item.value = Item.buyPrice(silver: 1);
+			Item.value = Item.buyPrice(4);
 			Item.rare = ItemRarityID.Blue;
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = false;
@@ -37,6 +37,37 @@ namespace WorldEdit.Content.Items
             int tileY = (int)(Main.MouseWorld.Y / 16f);
             Tile tile = Main.tile[tileX, tileY];
 
+            (int x, int y) = GetSelectionPositionFromPixelPosition(Main.MouseWorld);
+
+            modPlayer.Selection1 = new Vector2(x, y);
+
+            Main.NewText($"First Position:[{x}, {y}] ", 0, 233, 0);
+
+            return base.UseItem(player);
+        }
+        public override bool AltFunctionUse(Player player)
+        {
+            WorldEditPlayer modPlayer = player.GetModPlayer<WorldEditPlayer>();
+            if (modPlayer == null) throw new System.NullReferenceException("modPlayer is null");
+
+			(int x, int y) = GetSelectionPositionFromPixelPosition(Main.MouseWorld);
+
+			modPlayer.Selection2 = new Vector2(x, y);
+            
+			Main.NewText($"Second Position:[{x}, {y}] ", 0, 233, 0);
+
+            return base.AltFunctionUse(player);
+        }
+
+		public (int x, int y) GetSelectionPositionFromPixelPosition(Vector2 pixelPosition)
+		{
+            int tileX = (int)(pixelPosition.X / 16f);
+            int tileY = (int)(Main.MouseWorld.Y / 16f);
+
+			return (tileX, tileY);
+
+            Tile tile = Main.tile[tileX, tileY];
+
             if (tile != null && tile.HasTile)
             {
                 ushort type = tile.TileType;
@@ -44,8 +75,7 @@ namespace WorldEdit.Content.Items
             }
             else
                 Main.NewText($"No active tile at ({tileX}, {tileY})", 200, 200, 200);
-
-            return base.UseItem(player);
+			return (tileX, tileY);
         }
 
         public override void AddRecipes()

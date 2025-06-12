@@ -7,8 +7,9 @@ using Microsoft.Xna.Framework;
 using Terraria;
 
 namespace WorldEdit;
-public struct Clipboard
+public class Clipboard
 {
-    public int[,] values;
+    public Tile[,] Tiles;
+    public Vector2 Size;
     public Vector2 offset;
 }
