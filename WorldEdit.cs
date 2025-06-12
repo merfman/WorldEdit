@@ -162,7 +162,7 @@ public class WorldEdit : Mod
         for (int x = minX; x <= maxX; x++)
             for (int y = minY; y <= maxY; y++)
             {
-                //if (!WorldGen.InWorld(x, y)) continue;
+                if (!WorldGen.InWorld(x, y)) continue;
 
                 int localX = (x - minX) % width;
                 int localY = (y - minY) % height;
