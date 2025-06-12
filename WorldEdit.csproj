@@ -10,7 +10,7 @@
 
 	<!-- References -->
 	<ItemGroup>
-		
+	  <None Remove="Content\Items\WoodenAxe.png" />
 	</ItemGroup>
 
 </Project>

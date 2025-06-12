@@ -11,3 +11,16 @@ Items: {
 			'''
 	}
 }
+
+Configs: {
+	WorldEditServerConfig.DisplayName: World Edit Server Config
+
+	WorldEditClientConfig: {
+		FastClipboard: {
+			Tooltip: Trades tile accuracy and may not save some mod specific tile attributes for better speed and memory use
+			Label: Fast Clipboard (Trades tile accuracy for better speed and memory use)
+		}
+
+		DisplayName: World Edit Client Config
+	}
+}

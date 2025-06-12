@@ -15,9 +15,3 @@ public class WorldEditPlayer : ModPlayer
     public Clipboard clipboard;
     
 }
-
-public struct Clipboard
-{
-    public int[,] values;
-    public Vector2 offset;
-}
