@@ -190,6 +190,5 @@ public class WorldEdit : Mod
                     NetMessage.SendTileSquare(-1, x, y, 1);
             }
 
-        return 0;
-    }
+	}
 }
