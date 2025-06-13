@@ -19,23 +19,28 @@ public class WorldEditUI : UIState
     public UITextPanel<string> SetButton;
     public DraggableUIPanel frame;
 
+    public float Margin = 10f;
+    public float ButtonHeight = 50f;
+
     public override void OnInitialize()
     {
-        CopyButton = new UITextPanel<string>("Copy ", 0.8f, true) { Left = new(100f, 0f), Top = new(100f, 0f), Width = new(150f, 0f), Height = new(50f, 0f) };
+        float compountHeight = 0;
+        float vMargin = Margin;
+        CopyButton = new UITextPanel<string>("Copy ", 0.8f, true) { Left = new(Margin, 0f), Top = new(vMargin, 0f), Width = new(150f, 0f), Height = new(ButtonHeight, 0f) };
         CopyButton.OnLeftClick += OnCopyButtonClick;
 
-        PasteButton = new UITextPanel<string>("Paste ", 0.8f, true) { Left = new(100f, 0f), Top = new(160f, 0f), Width = new(150f, 0f), Height = new(50f, 0f) };
+        compountHeight += ButtonHeight;
+        vMargin += Margin;
+        PasteButton = new UITextPanel<string>("Paste ", 0.8f, true) { Left = new(Margin, 0f), Top = new(vMargin + compountHeight, 0f), Width = new(150f, 0f), Height = new(ButtonHeight, 0f) };
         PasteButton.OnLeftClick += OnPasteButtonClick;
 
-        SetButton = new UITextPanel<string>("Set ", 0.8f, true) { Left = new(100f, 0f), Top = new(220f, 0f), Width = new(150f, 0f), Height = new(50f, 0f) };
+        compountHeight += ButtonHeight;
+        vMargin += Margin;
+        SetButton = new UITextPanel<string>("Set ", 0.8f, true) { Left = new(Margin, 0f), Top = new(vMargin + compountHeight, 0f), Width = new(150f, 0f), Height = new(ButtonHeight, 0f) };
         SetButton.OnLeftClick += OnSetButtonClick;
 
-        CopyButton.OnLeftMouseUp += OnRealise;
-        PasteButton.OnRightClick += OnRealise;
-        PasteButton.OnLeftMouseUp += OnRealise;
-        SetButton.OnLeftMouseUp += OnRealise;
-
-        frame = new DraggableUIPanel() { Left = new(300f, 0f), Top = new(200f, 0f), Width = new(300f, 0f), Height = new(400f, 0f), BackgroundColor = new Color(73, 94, 171) };
+        compountHeight += ButtonHeight;
+        frame = new DraggableUIPanel() { Left = new(300f, 0f), Top = new(200f, 0f), Width = new(150f + Margin * 4, 0f), Height = new(compountHeight + vMargin + (Margin * 4), 0f), BackgroundColor = new Color(73, 94, 171) };
         
         frame.Append(CopyButton);
         frame.Append(PasteButton);
@@ -43,21 +48,14 @@ public class WorldEditUI : UIState
         Append(frame);
     }
 
-    public bool IsMouseOnUi(Vector2 mousePos)
-    {
-        return ContainsPoint(mousePos);
-    }
-
     private void OnCopyButtonClick(UIMouseEvent evt, UIElement listeningElement)
     {
-        Main.blockInput = true;
         WorldEdit mod = ModContent.GetInstance<WorldEdit>();
         mod.Copy();
         Main.NewText("Copy Button clicked!", Color.Green);
     }
     private void OnPasteButtonClick(UIMouseEvent evt, UIElement listeningElement)
     {
-        //Main.blockInput = true;
         WorldEdit mod = ModContent.GetInstance<WorldEdit>();
         mod.Paste();
 
@@ -65,17 +63,10 @@ public class WorldEditUI : UIState
     }
     private void OnSetButtonClick(UIMouseEvent evt, UIElement listeningElement)
     {
-        Main.blockInput = true;
         WorldEdit mod = ModContent.GetInstance<WorldEdit>();
         mod.Set();
 
         Main.NewText("Set Button clicked!", Color.Green);
-    }
-
-    private void OnRealise(UIMouseEvent evt, UIElement listeningElement)
-    {
-        Main.blockInput = false;
-
     }
 
     public class SimpleUIElement : UIElement

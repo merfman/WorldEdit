@@ -126,7 +126,7 @@ public class WorldEdit : Mod
         return 0;
     }
 
-    public int Paste(Player player = null)
+    public int SetPaste(Player player = null)
     {
         if (player == null) player = Main.LocalPlayer;
         WorldEditPlayer modPlayer = null;
@@ -147,11 +147,21 @@ public class WorldEdit : Mod
         int maxY = (int)Math.Max(p1.Y, p2.Y);
 
         //Clipboard? clipboard = modPlayer.clipboard;
-        if (modPlayer.clipboard.Tiles == null || modPlayer.clipboard.Size == Vector2.Zero)
+        try
+        {
+            if (modPlayer.clipboard.Tiles == null || modPlayer.clipboard.Size == Vector2.Zero)
             {
+                Main.NewText("Clipboard is empty or uninitialized", Color.Red);
+                return 0;
+            }
+        }
+        catch
+        {
             Main.NewText("Clipboard is empty or uninitialized", Color.Red);
             return 0;
         }
+
+        Main.NewText("Clipboard exits", Color.Blue);
 
         int width = (int)modPlayer.clipboard.Size.X;
         int height = (int)modPlayer.clipboard.Size.Y;
@@ -192,4 +202,83 @@ public class WorldEdit : Mod
 
         return 0;
 	}
+
+    public int Paste(Player player = null)
+    {
+        if (player == null) player = Main.LocalPlayer;
+        WorldEditPlayer modPlayer = null;
+        try { modPlayer = player.GetModPlayer<WorldEditPlayer>(); }
+        catch { Main.NewText($"mod player: null", Color.Red); return 0; }
+        //Main.NewText($"mod player:{modPlayer.Player.name}");
+
+        Vector2 selec1 = modPlayer.Selection1;
+        Vector2 selec2 = modPlayer.Selection2;
+
+        int width = (int)modPlayer.clipboard.Size.X;
+        int height = (int)modPlayer.clipboard.Size.Y;
+
+        Point p1 = modPlayer.Selection1.ToPoint();
+        //Point p2 = modPlayer.Selection2.ToPoint();
+        Point p2 = new Point(p1.X + width - 1, p1.Y - (height - 1) );
+
+        // Ensure correct bounds (handles reverse selections)
+        int minX = (int)Math.Min(p1.X, p2.X);
+        int maxX = (int)Math.Max(p1.X, p2.X);
+        int minY = (int)Math.Min(p1.Y, p2.Y);
+        int maxY = (int)Math.Max(p1.Y, p2.Y);
+
+        //Clipboard? clipboard = modPlayer.clipboard;
+        try
+        {
+            if (modPlayer.clipboard.Tiles == null || modPlayer.clipboard.Size == Vector2.Zero)
+            {
+                Main.NewText("Clipboard is empty or uninitialized", Color.Red);
+                return 0;
+            }
+        }
+        catch
+        {
+            Main.NewText("Clipboard is empty or uninitialized", Color.Red);
+            return 0;
+        }
+
+        Main.NewText("Clipboard exits", Color.Blue);
+
+
+        Main.NewText($"Size:{modPlayer.clipboard.Size}");
+        Main.NewText($"width:({width}, {height})");
+        // Changes the tiles
+        for (int x = minX; x <= maxX; x++)
+            for (int y = minY; y <= maxY; y++)
+            {
+                if (!WorldGen.InWorld(x, y)) continue;
+
+                int localX = (x - minX) % width;
+                int localY = (y - minY) % height;
+
+                if (localX < 0) localX += width;
+                if (localY < 0) localY += height;
+
+                //Main.NewText($"PasteTile:({modPlayer.clipboard.Tiles[localX, localY]})", Color.Green);
+                Main.tile[x, y].CopyFrom(modPlayer.clipboard.Tiles[localX, localY]);
+            }
+
+        // Updates the Tiles 
+        for (int x = minX; x <= maxX; x++)
+            for (int y = minY; y <= maxY; y++)
+            {
+                if (!WorldGen.InWorld(x, y)) continue;
+
+                // Update visuals
+                WorldGen.SquareTileFrame(x, y, true);
+
+                WorldGen.SquareWallFrame(x, y, true);
+
+                // Optional: sync tile in multiplayer
+                if (Main.netMode == NetmodeID.Server)
+                    NetMessage.SendTileSquare(-1, x, y, 1);
+            }
+
+        return 0;
+    }
 }
